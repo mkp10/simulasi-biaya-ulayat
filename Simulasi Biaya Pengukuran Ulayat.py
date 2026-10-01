@@ -51,12 +51,12 @@ def _():
 @app.cell
 def _(alt, df, fixed, luas, total2, var_ha):
     # cost per item at the selected area: fixed items once in both schemes;
-    # per-Ha items x luas (Flat) or a share of Opsi 2's variable part by price weight
+    # per-Ha items x luas (Flat) or a share of basis koefisien's variable part by price weight
     _is_var = df.kategori_biaya == "Variable Cost"
     _label = df.sub_komponen + " · " + df["item"]  # ATK appears in both B and C
     _skema = {
         "Flat": df.jumlah.where(~_is_var, df.jumlah * luas),
-        "Opsi 2": df.jumlah.where(~_is_var, df.jumlah / var_ha * (total2 - fixed)),
+        "Simulasi Koefisien": df.jumlah.where(~_is_var, df.jumlah / var_ha * (total2 - fixed)),
     }
 
     def _pie(nama, biaya):
@@ -84,7 +84,7 @@ def _(get_luas, mo, set_luas):
     # ponytail: inputs must live in their own cell (marimo only reruns *other* cells on change); shown below with the chart
     luas_slider = mo.ui.slider(1, 5_000, value=get_luas(), label="Luas (Ha)", full_width=True, on_change=set_luas)
     luas_input = mo.ui.number(1, 5_000, value=get_luas(), on_change=set_luas)
-    tampil = mo.ui.multiselect(["Flat", "Opsi 2"], value=["Flat", "Opsi 2"], label="Tampilkan garis")
+    tampil = mo.ui.multiselect(["Flat", "Simulasi Koefisien"], value=["Flat", "Simulasi Koefisien"], label="Tampilkan garis")
     log_x = mo.ui.switch(label="Log scale sumbu X (luas)")
     log_y = mo.ui.switch(label="Log scale sumbu Y (biaya)")
     return log_x, log_y, luas_input, luas_slider, tampil
@@ -92,7 +92,7 @@ def _(get_luas, mo, set_luas):
 
 @app.cell(hide_code=True)
 def _():
-    # Opsi 2 ("coba koef.xlsx" > Simulasi (edit)): each block of hectares priced at tarif x koef, like tax brackets
+    # Simulasi Koefisien ("coba koef.xlsx" > Simulasi (edit)): each block of hectares priced at tarif x koef, like tax brackets
     TIERS = [(10, 1), (100, 0.25), (1_000, 0.08), (float("inf"), 0.05)]  # (batas atas Ha, koef)
 
     def opsi2_blok(ha, tarif):
@@ -133,23 +133,23 @@ def _(
     luas = get_luas() or 1  # number box can be cleared -> None
     fixed = df.loc[df.kategori_biaya == "Fixed Cost", "jumlah"].sum()
     var_ha = df.loc[df.kategori_biaya == "Variable Cost", "jumlah"].sum()
-    # Opsi 2 here: ATK stays fixed, koef only discounts the per-Ha items
+    # Simulasi Koefisien here: ATK stays fixed, koef only discounts the per-Ha items
     # (differs from the sheet, which also discounts ATK: ~1.7% lower)
     biaya_opsi2 = lambda ha: fixed + opsi2(ha, var_ha)
 
-    # fixed axes over the full slider range; tier breakpoints added so Opsi 2's bends show exactly
+    # fixed axes over the full slider range; tier breakpoints added so Simulasi Koefisien's bends show exactly
     # extra small-area points keep the lines smooth when X is on log scale
     sim = pd.DataFrame({"luas": sorted({*range(0, 5_001, 50), 1, 2, 5, 10, 20, 100, 1_000})})
     if log_x.value:
         sim = sim[sim.luas > 0]  # log(0) is undefined
     sim["Flat"] = fixed + var_ha * sim.luas
-    sim["Opsi 2"] = sim.luas.map(biaya_opsi2)
+    sim["Simulasi Koefisien"] = sim.luas.map(biaya_opsi2)
     sim = sim.melt("luas", var_name="skema", value_name="biaya")
 
     total = fixed + var_ha * luas
     total2 = round(biaya_opsi2(luas))
     assert luas != 100 or total2 == 55_605_000  # 30.000 + 1.710.000 x (10 + 90 x 0.25)
-    pilih = pd.DataFrame({"luas": [luas, luas], "skema": ["Flat", "Opsi 2"], "biaya": [total, total2]})
+    pilih = pd.DataFrame({"luas": [luas, luas], "skema": ["Flat", "Simulasi Koefisien"], "biaya": [total, total2]})
 
     enc = dict(
         x=alt.X("luas:Q", title="Luas (Ha)", scale=alt.Scale(type="log" if log_x.value else "linear")),
@@ -172,7 +172,7 @@ def _(
         mo.hstack([log_x, log_y], justify="start", gap=2),
         mo.md(f"**Total biaya {luas:,} Ha (flat): {rp(total)}**".replace(",", ".")),
         mo.md(f"Fixed Cost: {pct(fixed / total)} · Variable Cost: {pct(var_ha * luas / total)}"),
-        mo.md(f"**Opsi 2 (koef berjenjang): {rp(total2)}** · {total2 / total:.1%} dari flat · "
+        mo.md(f"**Simulasi Koefisien (berjenjang): {rp(total2)}** · {total2 / total:.1%} dari flat · "
               f"rata-rata {rp(total2 / luas)}/Ha"),
         mo.md(f"Fixed Cost: {pct(fixed / total2)} · Variable Cost: {pct((total2 - fixed) / total2)}"),
         (line + titik).properties(width="container"),
@@ -182,19 +182,19 @@ def _(
 
 @app.cell(hide_code=True)
 def _(alt, df, fixed, luas, mo, opsi2_blok, pd, rp, total, total2, var_ha):
-    # per-item: fixed items unchanged; per-Ha items share Opsi 2's variable part by their price weight
+    # per-item: fixed items unchanged; per-Ha items share Simulasi Koefisien's variable part by their price weight
     var2 = total2 - fixed
     is_var = df.kategori_biaya == "Variable Cost"
     rinci = df[["sub_komponen", "item", "kategori_biaya"]].copy()
     rinci["Flat"] = df.jumlah.where(~is_var, df.jumlah * luas)
-    rinci["Opsi 2"] = df.jumlah.where(~is_var, df.jumlah / var_ha * var2)
+    rinci["Simulasi Koefisien"] = df.jumlah.where(~is_var, df.jumlah / var_ha * var2)
     rinci.loc[len(rinci)] = ["", "Total", "", total, total2]
-    tabel = rinci.assign(**{k: rinci[k].map(rp) for k in ["Flat", "Opsi 2"]}).rename(
+    tabel = rinci.assign(**{k: rinci[k].map(rp) for k in ["Flat", "Simulasi Koefisien"]}).rename(
         columns={"sub_komponen": "Komponen", "item": "Item", "kategori_biaya": "Kategori"})
 
-    # per-block: where Opsi 2's variable part comes from
+    # per-block: where Simulasi Koefisien's variable part comes from
     blok = pd.DataFrame(opsi2_blok(luas, var_ha))
-    bar = alt.Chart(blok, title=f"Opsi 2 per Blok Luas ({luas:,} Ha)".replace(",", ".")).mark_bar().encode(
+    bar = alt.Chart(blok, title=f"Simulasi Koefisien per Blok Luas ({luas:,} Ha)".replace(",", ".")).mark_bar().encode(
         x=alt.X("biaya:Q", title="Biaya (Rp)", axis=alt.Axis(format=",.0f")),
         y=alt.Y("blok:N", title=None, sort=None),
         tooltip=["blok", "koef", alt.Tooltip("ha:Q", format=",.1f", title="Ha di blok ini"),
@@ -211,7 +211,7 @@ def _(alt, df, fixed, luas, mo, opsi2_blok, pd, rp, total, total2, var_ha):
 
 @app.cell
 def _(TIERS, df, mo, rp):
-    # Opsi 2 per-Ha price of each per-Ha item in each area block (harga x koef); ATK is fixed, paid once
+    # Simulasi Koefisien per-Ha price of each per-Ha item in each area block (harga x koef); ATK is fixed, paid once
     per_ha = df[df.kategori_biaya == "Variable Cost"].set_index("item")[["harga_satuan"]]
     prev_b = 0
     for batas_b, koef_b in TIERS:
@@ -223,7 +223,7 @@ def _(TIERS, df, mo, rp):
 
     atk = df.loc[df.kategori_biaya == "Fixed Cost", "jumlah"].sum()
     mo.vstack([
-        mo.md("### Opsi 2: Biaya per Ha per Blok Luas"),
+        mo.md("### Simulasi Koefisien: Biaya per Ha per Blok Luas"),
         mo.ui.table(per_ha, selection=None, pagination=False),
         mo.md(f"ATK (Fixed Cost) {rp(atk)} dibayar sekali, tidak per Ha."),
     ])
@@ -232,13 +232,13 @@ def _(TIERS, df, mo, rp):
 
 @app.cell
 def _(alt, log_x, log_y, luas, mo, opsi2, pd):
-    # compare Opsi 2's coefficients with sqrt(Area), both in "Ha setara tarif penuh":
-    #   Opsi 2: sum of koef x Ha over the blocks  (= opsi2(ha, 1))
-    #   sqrt:   sqrt(10 x Ha), scaled to equal Opsi 2 at 10 Ha (end of the full-rate block)
+    # compare Simulasi Koefisien's coefficients with sqrt(Area), both in "Ha setara tarif penuh":
+    #   Simulasi Koefisien: sum of koef x Ha over the blocks  (= opsi2(ha, 1))
+    #   sqrt:   sqrt(10 x Ha), scaled to equal Simulasi Koefisien at 10 Ha (end of the full-rate block)
     _ha = sorted({*range(0, 5_001, 50), 1, 2, 5, 10, 20, 100, 1_000})
     if log_x.value or log_y.value:
         _ha = [h for h in _ha if h > 0]  # log(0) undefined
-    _model = {"√Luas (√(10 × Luas))": lambda h: (10 * h) ** 0.5, "Koef Opsi 2 (Σ koef × Ha)": lambda h: opsi2(h, 1)}
+    _model = {"√Luas (√(10 × Luas))": lambda h: (10 * h) ** 0.5, "Simulasi Koefisien (Σ koef × Ha)": lambda h: opsi2(h, 1)}
     akar = pd.DataFrame([{"luas": h, "garis": g, "setara": f(h)} for g, f in _model.items() for h in _ha])
     _pilih = pd.DataFrame([{"luas": luas, "garis": g, "setara": f(luas)} for g, f in _model.items()])
 
@@ -248,7 +248,7 @@ def _(alt, log_x, log_y, luas, mo, opsi2, pd):
         color=alt.Color("garis:N", title=None, sort=list(_model), legend=alt.Legend(orient="top")),
         tooltip=["garis", "luas", alt.Tooltip("setara:Q", format=",.1f", title="Ha setara")],
     )
-    _chart = (alt.Chart(akar, title="Apakah koefisien Opsi 2 mengikuti √Luas?").mark_line().encode(**_enc)
+    _chart = (alt.Chart(akar, title="Apakah Simulasi Koefisien mengikuti √Luas?").mark_line().encode(**_enc)
               + alt.Chart(_pilih).mark_point(size=120, filled=True).encode(**_enc)
               ).properties(width="container")
     _rasio = opsi2(luas, 1) / (10 * luas) ** 0.5
@@ -271,8 +271,8 @@ def _(alt, log_x, log_y, luas, mo, opsi2, pd):
             "Luas 100× lebih besar → batas hanya 10× lebih panjang."
         ),
         mo.md(
-            f"Koef Opsi 2 pada {_f(luas)} Ha = **{_f(opsi2(luas, 1), 1)} Ha setara** vs √Luas "
-            f"{_f((10 * luas) ** 0.5, 1)} → Opsi 2 **{_f(_rasio * 100, 0)}%** dari kurva √Luas "
+            f"Simulasi Koefisien pada {_f(luas)} Ha = **{_f(opsi2(luas, 1), 1)} Ha setara** vs √Luas "
+            f"{_f((10 * luas) ** 0.5, 1)} → **{_f(_rasio * 100, 0)}%** dari kurva √Luas "
             "(>100% = lebih mahal dari model batas, <100% = lebih murah)."
         ),
     ])
