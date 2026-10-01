@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-B2ootaw-.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-CxL0S8W7.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-D9fedIX3.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-BTCkDNvf.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-DU3aDxX5.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-CLVRCuM9.ttf" as="font" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>Simulasi Biaya Pengukuran Ulayat</title>
+    <script type="module" crossorigin src="./assets/index-DVgeLSg0.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-D2MJg03u.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-D8GwTfvk.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-BKtXLv3a.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-ZmTK25f3.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-DX6CQ6PA.js">
+    <link rel="modulepreload" crossorigin href="./assets/hotkeys-BHHWjLlp.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-Cb-RVVEn.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-CZ3Cs4qb.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin href="./assets/Combination-BAEdC-rz.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-BMjcEb2j.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DwV58Fb1.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-BCdY6lG5.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-Dr3SxUsb.js">
+    <link rel="modulepreload" crossorigin href="./assets/x-ZP5cObgf.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-BVdzZKAh.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-CMQz28hC.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-BDYuj3zG.js">
+    <link rel="modulepreload" crossorigin href="./assets/_Uint8Array-BGESiCQL.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseIsEqual-B9N9Mw_N.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-BhXAndur.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CAG_dYON.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-Duhs3RiJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-BBX6ug-N.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-YqBXNpsM.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-DxQeE5uh.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-DXdzqzcr.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-CMf25YiV.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-B6Cb__3x.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-BOFn9QrD.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-Q0O7_stz.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-B4FYHTZl.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BGkTcW3U.js">
+    <link rel="modulepreload" crossorigin href="./assets/toString-DlRqgfqz.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasUnicode-CWqKLxBC.js">
+    <link rel="modulepreload" crossorigin href="./assets/assertNever-CBU83Y6o.js">
+    <link rel="modulepreload" crossorigin href="./assets/_arrayReduce-TT0iOGKY.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-ClI_npeg.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-CS26E0hA.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-DQozhcp1.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Bul8mtFs.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-MM7JYRxj.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-B3rBsy4P.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-BzSgteR-.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DxWb3aMV.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-NOntBqny.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CF9gSfGe.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-PzrizfuL.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BNkRH34W.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-LUpffRIq.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-MyTWYTLd.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-maX8rbyb.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Bt3KRZho.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-jWatZkll.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-DETS9bBd.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-CH5Rj0g8.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseProperty-NKyJO2oh.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-6sUe0ZdD.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-B3mjKxHe.js">
+    <link rel="modulepreload" crossorigin href="./assets/toInteger-CDcO32Gx.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-k4ePIFAU.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-U5Goe76G.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-Botr-aL3.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-DA8-7wQv.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right--18M_6o9.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-ldcmQvIV.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-Cm6Ba9qg.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-BckyRbYt.js">
+    <link rel="modulepreload" crossorigin href="./assets/multi-map-DxdLNTBd.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-BOoN6gJ1.js">
+    <link rel="modulepreload" crossorigin href="./assets/card-OlSjYhmd.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-BW4srmS0.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-eb-NieZw.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CDXJRSCj.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-E64zk6_7.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-7iEVSqwM.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-BmPX99zz.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-D7O23mOZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-BIDQNg9Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-BfYAMNLF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-Db6Vjve5.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-C__vuri5.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-DUrq2DiR.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-7AQBmdyV.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-CH1FzjxU.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-Vbll2pdD.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-DScsXgJW.js">
+    <link rel="modulepreload" crossorigin href="./assets/mode-C1hn9AVp.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-BMGLSTg8.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-TZBmrJmc.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-B9ts0mNl.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-DHrHayPa.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-BCOZVFBt.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-6uJrSKbw.js">
+    <link rel="modulepreload" crossorigin href="./assets/capitalize-CmNnkG9y.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-D-8y6iMN.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-B7DF33lD.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-Dx8TEWFP.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-DDsWrxuJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-CebQ7XwA.js">
+    <link rel="modulepreload" crossorigin href="./assets/ai-model-dropdown-BMv5J-EA.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-JieDVWC_.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-CU2C3Vxx.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-BLne0bXb.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-DXARUlxo.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-DxKBXCGp.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-B9Ifj8Jf.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-D4fX0Ee_.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-BNN1HA7x.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-DvW8RUk0.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-acoDY9Ku.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-AxOl5_1Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-a6bY4dzO.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-v8ME_JKB.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-CVa2JapI.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus--DQRDy9D.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-BTO7DS3k.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-DPlx2kjA.js">
+    <link rel="modulepreload" crossorigin href="./assets/katex-CDLTCvjQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-DqiLSa6X.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-BMidGaii.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-COpfLoar.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-DrrCdLgV.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-DZrAQFIu.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-CG3x4AfR.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-B_pQb20b.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-CobRswjh.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-CCVfmA-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-DDt9wNjK.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-CrvjILe3.js">
+    <link rel="modulepreload" crossorigin href="./assets/maps-D2_Mq1pZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-BiFDv3jB.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-C59xfSYt.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-CqhdUl2n.js">
+    <link rel="modulepreload" crossorigin href="./assets/range-D2UKkEg-.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CfDbAm78.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-ChH_9MPt.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeleteCell-CRLMdzIa.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CCHmxi8d.js">
+    <link rel="modulepreload" crossorigin href="./assets/process-output-uzyiTMlC.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-D-eV0cU3.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-DfWeGRFv.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-BqiVbELQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-Ch78NKWp.js">
+    <link rel="modulepreload" crossorigin href="./assets/play-GLWQQs7F.js">
+    <link rel="modulepreload" crossorigin href="./assets/add-cell-with-ai-C09q01JF.js">
+    <link rel="modulepreload" crossorigin href="./assets/isEmpty-CgX_-6Mt.js">
+    <link rel="modulepreload" crossorigin href="./assets/bot-message-square-B2ThzDUZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/chat-display-DLmJWehR.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-qvVRjhv1.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-B6mgCeFJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-Ch0xnJY4.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-BZevmZKp.js">
+    <link rel="modulepreload" crossorigin href="./assets/toggle-zVW4FXNz.js">
+    <link rel="modulepreload" crossorigin href="./assets/globals-DVVNoYwt.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-ipf2hrOh.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-5Rdwpmr3.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Da3ksQXL.js">
+    <link rel="modulepreload" crossorigin href="./assets/utilities.esm-Di0IV3nO.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-CMt2sk--.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAddCell-DKJ0NHXX.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-AK_9uodG.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-Co1fGZLh.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-video-camera-C3wGzBnE.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-Dv1-Phf0.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-DN_xCV6A.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-CEIWhPlm.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-CySaBlkz.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-Ck_unDZw.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-5OUgerQ3.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-C1UhS3qM.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-DaaA-ptl.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-BYgU_srD.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CycJImp8.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFlatten-CUZNxU8H.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-D-7VEN0q.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-B_6Qi5aM.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-CgN_Yig7.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-Dg7clfkc.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-CuJ72M8f.js">
+    <link rel="modulepreload" crossorigin href="./assets/settings-OBbrbhij.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-i_UbZC0w.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-jmgGt1lS.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-B7vuddcd.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-CeUwN_0i.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    <marimo-code hidden="">import%20marimo%0A%0A__generated_with%20%3D%20%220.19.11%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20import%20pandas%20as%20pd%0A%0A%20%20%20%20return%20mo%2C%20pd%0A%0A%0A%40app.cell%0Adef%20_(pd)%3A%0A%0A%20%20%20%20cols%20%3D%20%5B%22kode_output%22%2C%20%22uraian_output%22%2C%20%22kode_komponen%22%2C%20%22uraian_komponen%22%2C%20%22jenis_komponen%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22sub_komponen%22%2C%20%22uraian_sub_komponen%22%2C%20%22akun%22%2C%20%22uraian_akun%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22item%22%2C%20%22volume%22%2C%20%22satuan%22%2C%20%22harga_satuan%22%2C%20%22jumlah%22%5D%0A%0A%20%20%20%20out%20%3D%20(%226413.QAB.U17%22%2C%20%22PBT%20Luasan%20(Ulayat%2FHKB%20Redis%2FBMN%2FHPL)%20Luar%20Jawa%20Bali%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%22052%22%2C%20%22Pengukuran%20dan%20Pemetaan%20Bidang%20Tanah%22%2C%20%22UTAMA%22)%0A%20%20%20%20B%20%3D%20(%22B%22%2C%20%22Partisipasi%20Masyarakat%22)%0A%20%20%20%20C%20%3D%20(%22C%22%2C%20%22Pengukuran%20dan%20Pemetaan%20Bidang%20Tanah%22)%0A%20%20%20%20BRG%20%3D%20(%22528111%22%2C%20%22Belanja%20Barang%20Persediaan%20Barang%20Konsumsi%22)%0A%20%20%20%20NON%20%3D%20(%22521219%22%2C%20%22Belanja%20Barang%20Non%20Operasional%20Lainnya%22)%0A%0A%20%20%20%20rows%20%3D%20%5B%0A%20%20%20%20%20%20%20%20(*out%2C%20*B%2C%20*BRG%2C%20%22ATK%22%2C%20%20%20%20%20%20%20%20%20%20%20%20%20%20%201%2C%20%22Paket%22%2C%20%205_000%2C%20%20%205_000)%2C%0A%20%20%20%20%20%20%20%20(*out%2C%20*B%2C%20*NON%2C%20%22Operasional%20lapang%22%2C%201%2C%20%22Hektar%22%2C%20230_000%2C%20230_000)%2C%0A%20%20%20%20%20%20%20%20(*out%2C%20*C%2C%20*BRG%2C%20%22ATK%22%2C%20%20%20%20%20%20%20%20%20%20%20%20%20%20%201%2C%20%22Paket%22%2C%20%2025_000%2C%20%2025_000)%2C%0A%20%20%20%20%20%20%20%20(*out%2C%20*C%2C%20*NON%2C%20%22Pembantu%20Ukur%22%2C%20%20%20%20%201%2C%20%22Hektar%22%2C%20128_000%2C%20128_000)%2C%0A%20%20%20%20%20%20%20%20(*out%2C%20*C%2C%20*NON%2C%20%22Petugas%20Ukur%22%2C%20%20%20%20%20%201%2C%20%22Hektar%22%2C%20676_000%2C%20676_000)%2C%0A%20%20%20%20%20%20%20%20(*out%2C%20*C%2C%20*NON%2C%20%22Koordinator%22%2C%20%20%20%20%20%20%201%2C%20%22Hektar%22%2C%20676_000%2C%20676_000)%2C%0A%20%20%20%20%5D%0A%0A%20%20%20%20df%20%3D%20pd.DataFrame(rows%2C%20columns%3Dcols)%0A%20%20%20%20%23%20per-Hektar%20items%20scale%20with%20area%20-%3E%20variable%3B%20per-Paket%20(ATK)%20stays%20flat%20-%3E%20fixed%0A%20%20%20%20df%5B%22kategori_biaya%22%5D%20%3D%20df.satuan.str.lower().map(%7B%22hektar%22%3A%20%22Variable%20Cost%22%7D).fillna(%22Fixed%20Cost%22)%0A%20%20%20%20return%20(df%2C)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20altair%20as%20alt%0A%0A%20%20%20%20return%20(alt%2C)%0A%0A%0A%40app.cell%0Adef%20_(alt%2C%20df%2C%20fixed%2C%20luas%2C%20total2%2C%20var_ha)%3A%0A%20%20%20%20%23%20cost%20per%20item%20at%20the%20selected%20area%3A%20fixed%20items%20once%20in%20both%20schemes%3B%0A%20%20%20%20%23%20per-Ha%20items%20x%20luas%20(Flat)%20or%20a%20share%20of%20Opsi%202's%20variable%20part%20by%20price%20weight%0A%20%20%20%20_is_var%20%3D%20df.kategori_biaya%20%3D%3D%20%22Variable%20Cost%22%0A%20%20%20%20_label%20%3D%20df.sub_komponen%20%2B%20%22%20%C2%B7%20%22%20%2B%20df%5B%22item%22%5D%20%20%23%20ATK%20appears%20in%20both%20B%20and%20C%0A%20%20%20%20_skema%20%3D%20%7B%0A%20%20%20%20%20%20%20%20%22Flat%22%3A%20df.jumlah.where(~_is_var%2C%20df.jumlah%20*%20luas)%2C%0A%20%20%20%20%20%20%20%20%22Opsi%202%22%3A%20df.jumlah.where(~_is_var%2C%20df.jumlah%20%2F%20var_ha%20*%20(total2%20-%20fixed))%2C%0A%20%20%20%20%7D%0A%0A%20%20%20%20def%20_pie(nama%2C%20biaya)%3A%0A%20%20%20%20%20%20%20%20_judul%20%3D%20f%22%7Bnama%7D%3A%20%7Bluas%3A%2C%7D%20Ha%20%C2%B7%20Rp%20%7Bround(biaya.sum())%3A%2C%7D%22.replace(%22%2C%22%2C%20%22.%22)%0A%20%20%20%20%20%20%20%20return%20alt.Chart(df.assign(label%3D_label%2C%20jumlah%3Dbiaya)%2C%20title%3D_judul).mark_arc().encode(%0A%20%20%20%20%20%20%20%20%20%20%20%20theta%3D%22jumlah%3AQ%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3Dalt.Color(%22label%3AN%22%2C%20title%3D%22Item%22)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20tooltip%3D%5B%22label%22%2C%20alt.Tooltip(%22jumlah%3AQ%22%2C%20format%3D%22%2C.0f%22)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20alt.Tooltip(%22pct%3AQ%22%2C%20format%3D%22.2%25%22%2C%20title%3D%22porsi%22)%5D%2C%0A%20%20%20%20%20%20%20%20).transform_joinaggregate(total%3D%22sum(jumlah)%22).transform_calculate(pct%3D%22datum.jumlah%20%2F%20datum.total%22)%0A%0A%20%20%20%20alt.hconcat(*%5B_pie(n%2C%20b)%20for%20n%2C%20b%20in%20_skema.items()%5D).resolve_scale(color%3D%22shared%22)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20%23%20shared%20state%20keeps%20slider%20and%20number%20input%20in%20sync%0A%20%20%20%20get_luas%2C%20set_luas%20%3D%20mo.state(100)%0A%20%20%20%20return%20get_luas%2C%20set_luas%0A%0A%0A%40app.cell%0Adef%20_(get_luas%2C%20mo%2C%20set_luas)%3A%0A%20%20%20%20%23%20ponytail%3A%20inputs%20must%20live%20in%20their%20own%20cell%20(marimo%20only%20reruns%20*other*%20cells%20on%20change)%3B%20shown%20below%20with%20the%20chart%0A%20%20%20%20luas_slider%20%3D%20mo.ui.slider(1%2C%205_000%2C%20value%3Dget_luas()%2C%20label%3D%22Luas%20(Ha)%22%2C%20full_width%3DTrue%2C%20on_change%3Dset_luas)%0A%20%20%20%20luas_input%20%3D%20mo.ui.number(1%2C%205_000%2C%20value%3Dget_luas()%2C%20on_change%3Dset_luas)%0A%20%20%20%20tampil%20%3D%20mo.ui.multiselect(%5B%22Flat%22%2C%20%22Opsi%202%22%5D%2C%20value%3D%5B%22Flat%22%2C%20%22Opsi%202%22%5D%2C%20label%3D%22Tampilkan%20garis%22)%0A%20%20%20%20log_x%20%3D%20mo.ui.switch(label%3D%22Log%20scale%20sumbu%20X%20(luas)%22)%0A%20%20%20%20log_y%20%3D%20mo.ui.switch(label%3D%22Log%20scale%20sumbu%20Y%20(biaya)%22)%0A%20%20%20%20return%20log_x%2C%20log_y%2C%20luas_input%2C%20luas_slider%2C%20tampil%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_()%3A%0A%20%20%20%20%23%20Opsi%202%20(%22coba%20koef.xlsx%22%20%3E%20Simulasi%20(edit))%3A%20each%20block%20of%20hectares%20priced%20at%20tarif%20x%20koef%2C%20like%20tax%20brackets%0A%20%20%20%20TIERS%20%3D%20%5B(10%2C%201)%2C%20(100%2C%200.25)%2C%20(1_000%2C%200.08)%2C%20(float(%22inf%22)%2C%200.05)%5D%20%20%23%20(batas%20atas%20Ha%2C%20koef)%0A%0A%20%20%20%20def%20opsi2_blok(ha%2C%20tarif)%3A%0A%20%20%20%20%20%20%20%20%22%22%22Cost%20per%20block%3A%20%5B%7Bblok%2C%20koef%2C%20ha%2C%20biaya%7D%2C%20...%5D%20for%20blocks%20the%20area%20reaches.%22%22%22%0A%20%20%20%20%20%20%20%20out%2C%20prev%20%3D%20%5B%5D%2C%200%0A%20%20%20%20%20%20%20%20for%20batas%2C%20koef%20in%20TIERS%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20ha%20%3C%3D%20prev%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20break%0A%20%20%20%20%20%20%20%20%20%20%20%20n%20%3D%20min(ha%2C%20batas)%20-%20prev%0A%20%20%20%20%20%20%20%20%20%20%20%20nama%20%3D%20f%22%3E%20%7Bprev%3A%2C%7D%20Ha%22%20if%20batas%20%3D%3D%20float(%22inf%22)%20else%20f%22%7Bprev%3A%2C%7D%E2%80%93%7Bbatas%3A%2C%7D%20Ha%22%0A%20%20%20%20%20%20%20%20%20%20%20%20out.append(%7B%22blok%22%3A%20nama.replace(%22%2C%22%2C%20%22.%22)%2C%20%22koef%22%3A%20koef%2C%20%22ha%22%3A%20n%2C%20%22biaya%22%3A%20n%20*%20tarif%20*%20koef%7D)%0A%20%20%20%20%20%20%20%20%20%20%20%20prev%20%3D%20batas%0A%20%20%20%20%20%20%20%20return%20out%0A%0A%20%20%20%20def%20opsi2(ha%2C%20tarif)%3A%0A%20%20%20%20%20%20%20%20return%20sum(b%5B%22biaya%22%5D%20for%20b%20in%20opsi2_blok(ha%2C%20tarif))%0A%0A%20%20%20%20%23%20tier%20logic%20matches%20column%20F%20of%20the%20sheet%20(sheet%20applies%20koef%20to%20the%20full%201.740.000)%0A%20%20%20%20assert%20opsi2(10%2C%201_740_000)%20%3D%3D%2017_400_000%0A%20%20%20%20assert%20round(opsi2(3_000%2C%201_740_000))%20%3D%3D%20355_830_000%0A%20%20%20%20return%20TIERS%2C%20opsi2%2C%20opsi2_blok%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(%0A%20%20%20%20alt%2C%0A%20%20%20%20df%2C%0A%20%20%20%20get_luas%2C%0A%20%20%20%20log_x%2C%0A%20%20%20%20log_y%2C%0A%20%20%20%20luas_input%2C%0A%20%20%20%20luas_slider%2C%0A%20%20%20%20mo%2C%0A%20%20%20%20opsi2%2C%0A%20%20%20%20pd%2C%0A%20%20%20%20tampil%2C%0A)%3A%0A%20%20%20%20luas%20%3D%20get_luas()%20or%201%20%20%23%20number%20box%20can%20be%20cleared%20-%3E%20None%0A%20%20%20%20fixed%20%3D%20df.loc%5Bdf.kategori_biaya%20%3D%3D%20%22Fixed%20Cost%22%2C%20%22jumlah%22%5D.sum()%0A%20%20%20%20var_ha%20%3D%20df.loc%5Bdf.kategori_biaya%20%3D%3D%20%22Variable%20Cost%22%2C%20%22jumlah%22%5D.sum()%0A%20%20%20%20%23%20Opsi%202%20here%3A%20ATK%20stays%20fixed%2C%20koef%20only%20discounts%20the%20per-Ha%20items%0A%20%20%20%20%23%20(differs%20from%20the%20sheet%2C%20which%20also%20discounts%20ATK%3A%20~1.7%25%20lower)%0A%20%20%20%20biaya_opsi2%20%3D%20lambda%20ha%3A%20fixed%20%2B%20opsi2(ha%2C%20var_ha)%0A%0A%20%20%20%20%23%20fixed%20axes%20over%20the%20full%20slider%20range%3B%20tier%20breakpoints%20added%20so%20Opsi%202's%20bends%20show%20exactly%0A%20%20%20%20%23%20extra%20small-area%20points%20keep%20the%20lines%20smooth%20when%20X%20is%20on%20log%20scale%0A%20%20%20%20sim%20%3D%20pd.DataFrame(%7B%22luas%22%3A%20sorted(%7B*range(0%2C%205_001%2C%2050)%2C%201%2C%202%2C%205%2C%2010%2C%2020%2C%20100%2C%201_000%7D)%7D)%0A%20%20%20%20if%20log_x.value%3A%0A%20%20%20%20%20%20%20%20sim%20%3D%20sim%5Bsim.luas%20%3E%200%5D%20%20%23%20log(0)%20is%20undefined%0A%20%20%20%20sim%5B%22Flat%22%5D%20%3D%20fixed%20%2B%20var_ha%20*%20sim.luas%0A%20%20%20%20sim%5B%22Opsi%202%22%5D%20%3D%20sim.luas.map(biaya_opsi2)%0A%20%20%20%20sim%20%3D%20sim.melt(%22luas%22%2C%20var_name%3D%22skema%22%2C%20value_name%3D%22biaya%22)%0A%0A%20%20%20%20total%20%3D%20fixed%20%2B%20var_ha%20*%20luas%0A%20%20%20%20total2%20%3D%20round(biaya_opsi2(luas))%0A%20%20%20%20assert%20luas%20!%3D%20100%20or%20total2%20%3D%3D%2055_605_000%20%20%23%2030.000%20%2B%201.710.000%20x%20(10%20%2B%2090%20x%200.25)%0A%20%20%20%20pilih%20%3D%20pd.DataFrame(%7B%22luas%22%3A%20%5Bluas%2C%20luas%5D%2C%20%22skema%22%3A%20%5B%22Flat%22%2C%20%22Opsi%202%22%5D%2C%20%22biaya%22%3A%20%5Btotal%2C%20total2%5D%7D)%0A%0A%20%20%20%20enc%20%3D%20dict(%0A%20%20%20%20%20%20%20%20x%3Dalt.X(%22luas%3AQ%22%2C%20title%3D%22Luas%20(Ha)%22%2C%20scale%3Dalt.Scale(type%3D%22log%22%20if%20log_x.value%20else%20%22linear%22))%2C%0A%20%20%20%20%20%20%20%20y%3Dalt.Y(%22biaya%3AQ%22%2C%20title%3D%22Biaya%20(Rp)%22%2C%20axis%3Dalt.Axis(format%3D%22%2C.0f%22)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20scale%3Dalt.Scale(type%3D%22log%22%20if%20log_y.value%20else%20%22linear%22))%2C%0A%20%20%20%20%20%20%20%20color%3Dalt.Color(%22skema%3AN%22%2C%20title%3D%22Skema%22)%2C%0A%20%20%20%20%20%20%20%20tooltip%3D%5B%22skema%22%2C%20%22luas%22%2C%20alt.Tooltip(%22biaya%3AQ%22%2C%20format%3D%22%2C.0f%22)%5D%2C%0A%20%20%20%20)%0A%20%20%20%20sim%2C%20pilih%20%3D%20sim%5Bsim.skema.isin(tampil.value)%5D%2C%20pilih%5Bpilih.skema.isin(tampil.value)%5D%0A%20%20%20%20line%20%3D%20alt.Chart(sim%2C%20title%3D%22Simulasi%20Biaya%20vs%20Luas%22).mark_line().encode(**enc)%0A%20%20%20%20titik%20%3D%20alt.Chart(pilih).mark_point(size%3D120%2C%20filled%3DTrue).encode(**enc)%0A%20%20%20%20rp%20%3D%20lambda%20x%3A%20f%22Rp%20%7Bround(x)%3A%2C%7D%22.replace(%22%2C%22%2C%20%22.%22)%0A%20%20%20%20%23%20tiny%20shares%20would%20round%20to%200.00%25%20%2F%20100.00%25%0A%20%20%20%20pct%20%3D%20lambda%20x%3A%20%22%3C%200.01%25%22%20if%200%20%3C%20x%20%3C%200.0001%20else%20%22%3E%2099.99%25%22%20if%200.9999%20%3C%20x%20%3C%201%20else%20f%22%7Bx%3A.2%25%7D%22%0A%20%20%20%20assert%20(pct(30_000%20%2F%201_710_030_000)%2C%20pct(1_710_000_000%20%2F%201_710_030_000)%2C%20pct(0.5))%20%3D%3D%20(%22%3C%200.01%25%22%2C%20%22%3E%2099.99%25%22%2C%20%2250.00%25%22)%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20luas_slider%2C%0A%20%20%20%20%20%20%20%20luas_input%2C%0A%20%20%20%20%20%20%20%20tampil%2C%0A%20%20%20%20%20%20%20%20mo.hstack(%5Blog_x%2C%20log_y%5D%2C%20justify%3D%22start%22%2C%20gap%3D2)%2C%0A%20%20%20%20%20%20%20%20mo.md(f%22**Total%20biaya%20%7Bluas%3A%2C%7D%20Ha%20(flat)%3A%20%7Brp(total)%7D**%22.replace(%22%2C%22%2C%20%22.%22))%2C%0A%20%20%20%20%20%20%20%20mo.md(f%22Fixed%20Cost%3A%20%7Bpct(fixed%20%2F%20total)%7D%20%C2%B7%20Variable%20Cost%3A%20%7Bpct(var_ha%20*%20luas%20%2F%20total)%7D%22)%2C%0A%20%20%20%20%20%20%20%20mo.md(f%22**Opsi%202%20(koef%20berjenjang)%3A%20%7Brp(total2)%7D**%20%C2%B7%20%7Btotal2%20%2F%20total%3A.1%25%7D%20dari%20flat%20%C2%B7%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20f%22rata-rata%20%7Brp(total2%20%2F%20luas)%7D%2FHa%22)%2C%0A%20%20%20%20%20%20%20%20mo.md(f%22Fixed%20Cost%3A%20%7Bpct(fixed%20%2F%20total2)%7D%20%C2%B7%20Variable%20Cost%3A%20%7Bpct((total2%20-%20fixed)%20%2F%20total2)%7D%22)%2C%0A%20%20%20%20%20%20%20%20(line%20%2B%20titik).properties(width%3D%22container%22)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%20fixed%2C%20luas%2C%20rp%2C%20total%2C%20total2%2C%20var_ha%0A%0A%0A%40app.cell(hide_code%3DTrue)%0Adef%20_(alt%2C%20df%2C%20fixed%2C%20luas%2C%20mo%2C%20opsi2_blok%2C%20pd%2C%20rp%2C%20total%2C%20total2%2C%20var_ha)%3A%0A%20%20%20%20%23%20per-item%3A%20fixed%20items%20unchanged%3B%20per-Ha%20items%20share%20Opsi%202's%20variable%20part%20by%20their%20price%20weight%0A%20%20%20%20var2%20%3D%20total2%20-%20fixed%0A%20%20%20%20is_var%20%3D%20df.kategori_biaya%20%3D%3D%20%22Variable%20Cost%22%0A%20%20%20%20rinci%20%3D%20df%5B%5B%22sub_komponen%22%2C%20%22item%22%2C%20%22kategori_biaya%22%5D%5D.copy()%0A%20%20%20%20rinci%5B%22Flat%22%5D%20%3D%20df.jumlah.where(~is_var%2C%20df.jumlah%20*%20luas)%0A%20%20%20%20rinci%5B%22Opsi%202%22%5D%20%3D%20df.jumlah.where(~is_var%2C%20df.jumlah%20%2F%20var_ha%20*%20var2)%0A%20%20%20%20rinci.loc%5Blen(rinci)%5D%20%3D%20%5B%22%22%2C%20%22Total%22%2C%20%22%22%2C%20total%2C%20total2%5D%0A%20%20%20%20tabel%20%3D%20rinci.assign(**%7Bk%3A%20rinci%5Bk%5D.map(rp)%20for%20k%20in%20%5B%22Flat%22%2C%20%22Opsi%202%22%5D%7D).rename(%0A%20%20%20%20%20%20%20%20columns%3D%7B%22sub_komponen%22%3A%20%22Komponen%22%2C%20%22item%22%3A%20%22Item%22%2C%20%22kategori_biaya%22%3A%20%22Kategori%22%7D)%0A%0A%20%20%20%20%23%20per-block%3A%20where%20Opsi%202's%20variable%20part%20comes%20from%0A%20%20%20%20blok%20%3D%20pd.DataFrame(opsi2_blok(luas%2C%20var_ha))%0A%20%20%20%20bar%20%3D%20alt.Chart(blok%2C%20title%3Df%22Opsi%202%20per%20Blok%20Luas%20(%7Bluas%3A%2C%7D%20Ha)%22.replace(%22%2C%22%2C%20%22.%22)).mark_bar().encode(%0A%20%20%20%20%20%20%20%20x%3Dalt.X(%22biaya%3AQ%22%2C%20title%3D%22Biaya%20(Rp)%22%2C%20axis%3Dalt.Axis(format%3D%22%2C.0f%22))%2C%0A%20%20%20%20%20%20%20%20y%3Dalt.Y(%22blok%3AN%22%2C%20title%3DNone%2C%20sort%3DNone)%2C%0A%20%20%20%20%20%20%20%20tooltip%3D%5B%22blok%22%2C%20%22koef%22%2C%20alt.Tooltip(%22ha%3AQ%22%2C%20format%3D%22%2C.1f%22%2C%20title%3D%22Ha%20di%20blok%20ini%22)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20alt.Tooltip(%22biaya%3AQ%22%2C%20format%3D%22%2C.0f%22)%5D%2C%0A%20%20%20%20).properties(width%3D%22container%22)%0A%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(f%22%23%23%23%20Rincian%20Biaya%20%7Bluas%3A%2C%7D%20Ha%22.replace(%22%2C%22%2C%20%22.%22))%2C%0A%20%20%20%20%20%20%20%20mo.ui.table(tabel%2C%20selection%3DNone%2C%20pagination%3DFalse)%2C%0A%20%20%20%20%20%20%20%20bar%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(TIERS%2C%20df%2C%20mo%2C%20rp)%3A%0A%20%20%20%20%23%20Opsi%202%20per-Ha%20price%20of%20each%20per-Ha%20item%20in%20each%20area%20block%20(harga%20x%20koef)%3B%20ATK%20is%20fixed%2C%20paid%20once%0A%20%20%20%20per_ha%20%3D%20df%5Bdf.kategori_biaya%20%3D%3D%20%22Variable%20Cost%22%5D.set_index(%22item%22)%5B%5B%22harga_satuan%22%5D%5D%0A%20%20%20%20prev_b%20%3D%200%0A%20%20%20%20for%20batas_b%2C%20koef_b%20in%20TIERS%3A%0A%20%20%20%20%20%20%20%20kolom%20%3D%20(f%22%3E%20%7Bprev_b%3A%2C%7D%20Ha%22%20if%20batas_b%20%3D%3D%20float(%22inf%22)%20else%20f%22%7Bprev_b%3A%2C%7D%E2%80%93%7Bbatas_b%3A%2C%7D%20Ha%22).replace(%22%2C%22%2C%20%22.%22)%0A%20%20%20%20%20%20%20%20per_ha%5Bf%22%7Bkolom%7D%20(x%7Bkoef_b%3Ag%7D)%22%5D%20%3D%20per_ha.harga_satuan%20*%20koef_b%0A%20%20%20%20%20%20%20%20prev_b%20%3D%20batas_b%0A%20%20%20%20per_ha.loc%5B%22Total%20per%20Ha%22%5D%20%3D%20per_ha.sum()%0A%20%20%20%20per_ha%20%3D%20per_ha.rename(columns%3D%7B%22harga_satuan%22%3A%20%22Harga%20Satuan%22%7D).map(rp).reset_index(names%3D%22Item%22)%0A%0A%20%20%20%20atk%20%3D%20df.loc%5Bdf.kategori_biaya%20%3D%3D%20%22Fixed%20Cost%22%2C%20%22jumlah%22%5D.sum()%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(%22%23%23%23%20Opsi%202%3A%20Biaya%20per%20Ha%20per%20Blok%20Luas%22)%2C%0A%20%20%20%20%20%20%20%20mo.ui.table(per_ha%2C%20selection%3DNone%2C%20pagination%3DFalse)%2C%0A%20%20%20%20%20%20%20%20mo.md(f%22ATK%20(Fixed%20Cost)%20%7Brp(atk)%7D%20dibayar%20sekali%2C%20tidak%20per%20Ha.%22)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(alt%2C%20log_x%2C%20log_y%2C%20luas%2C%20mo%2C%20opsi2%2C%20pd)%3A%0A%20%20%20%20%23%20compare%20Opsi%202's%20coefficients%20with%20sqrt(Area)%2C%20both%20in%20%22Ha%20setara%20tarif%20penuh%22%3A%0A%20%20%20%20%23%20%20%20Opsi%202%3A%20sum%20of%20koef%20x%20Ha%20over%20the%20blocks%20%20(%3D%20opsi2(ha%2C%201))%0A%20%20%20%20%23%20%20%20sqrt%3A%20%20%20sqrt(10%20x%20Ha)%2C%20scaled%20to%20equal%20Opsi%202%20at%2010%20Ha%20(end%20of%20the%20full-rate%20block)%0A%20%20%20%20_ha%20%3D%20sorted(%7B*range(0%2C%205_001%2C%2050)%2C%201%2C%202%2C%205%2C%2010%2C%2020%2C%20100%2C%201_000%7D)%0A%20%20%20%20if%20log_x.value%20or%20log_y.value%3A%0A%20%20%20%20%20%20%20%20_ha%20%3D%20%5Bh%20for%20h%20in%20_ha%20if%20h%20%3E%200%5D%20%20%23%20log(0)%20undefined%0A%20%20%20%20_model%20%3D%20%7B%22%E2%88%9ALuas%20(%E2%88%9A(10%20%C3%97%20Luas))%22%3A%20lambda%20h%3A%20(10%20*%20h)%20**%200.5%2C%20%22Koef%20Opsi%202%20(%CE%A3%20koef%20%C3%97%20Ha)%22%3A%20lambda%20h%3A%20opsi2(h%2C%201)%7D%0A%20%20%20%20akar%20%3D%20pd.DataFrame(%5B%7B%22luas%22%3A%20h%2C%20%22garis%22%3A%20g%2C%20%22setara%22%3A%20f(h)%7D%20for%20g%2C%20f%20in%20_model.items()%20for%20h%20in%20_ha%5D)%0A%20%20%20%20_pilih%20%3D%20pd.DataFrame(%5B%7B%22luas%22%3A%20luas%2C%20%22garis%22%3A%20g%2C%20%22setara%22%3A%20f(luas)%7D%20for%20g%2C%20f%20in%20_model.items()%5D)%0A%0A%20%20%20%20_enc%20%3D%20dict(%0A%20%20%20%20%20%20%20%20x%3Dalt.X(%22luas%3AQ%22%2C%20title%3D%22Luas%20(Ha)%22%2C%20scale%3Dalt.Scale(type%3D%22log%22%20if%20log_x.value%20else%20%22linear%22))%2C%0A%20%20%20%20%20%20%20%20y%3Dalt.Y(%22setara%3AQ%22%2C%20title%3D%22Ha%20setara%20tarif%20penuh%22%2C%20scale%3Dalt.Scale(type%3D%22log%22%20if%20log_y.value%20else%20%22linear%22))%2C%0A%20%20%20%20%20%20%20%20color%3Dalt.Color(%22garis%3AN%22%2C%20title%3DNone%2C%20sort%3Dlist(_model)%2C%20legend%3Dalt.Legend(orient%3D%22top%22))%2C%0A%20%20%20%20%20%20%20%20tooltip%3D%5B%22garis%22%2C%20%22luas%22%2C%20alt.Tooltip(%22setara%3AQ%22%2C%20format%3D%22%2C.1f%22%2C%20title%3D%22Ha%20setara%22)%5D%2C%0A%20%20%20%20)%0A%20%20%20%20_chart%20%3D%20(alt.Chart(akar%2C%20title%3D%22Apakah%20koefisien%20Opsi%202%20mengikuti%20%E2%88%9ALuas%3F%22).mark_line().encode(**_enc)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2B%20alt.Chart(_pilih).mark_point(size%3D120%2C%20filled%3DTrue).encode(**_enc)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20).properties(width%3D%22container%22)%0A%20%20%20%20_rasio%20%3D%20opsi2(luas%2C%201)%20%2F%20(10%20*%20luas)%20**%200.5%0A%0A%20%20%20%20_f%20%3D%20lambda%20x%2C%20d%3D0%3A%20f%22%7Bx%3A%2C.%7Bd%7Df%7D%22.replace(%22%2C%22%2C%20%22X%22).replace(%22.%22%2C%20%22%2C%22).replace(%22X%22%2C%20%22.%22)%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(%0A%20%20%20%20%20%20%20%20%20%20%20%20%22%23%23%23%20Mengapa%20biaya%20mengikuti%20panjang%20batas%5Cn%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%22Pada%20PBT%20luasan%20(ulayat%2C%20HPL)%2C%20tim%20mengukur%20**batas%20luar**%20satu%20bidang%20besar%3A%20menyusuri%20batas%2C%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%22memasang%20patok%2C%20mengambil%20koordinat%20GNSS%20di%20titik%20sudut%2C%20dan%20menyepakati%20batas%20dengan%20tetangga.%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%22Bagian%20dalam%20tidak%20diukur%20meter%20demi%20meter%2C%20jadi%20hari%20kerja%20lapangan%20bergantung%20pada%20**km%20batas**.%5Cn%5Cn%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%22Untuk%20bentuk%20apa%20pun%3A%20**keliling%20%3D%20c%20%C3%97%20%E2%88%9Aluas**.%20c%20%E2%89%88%203%2C5%20(lingkaran)%2C%204%20(persegi)%2C%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%226%E2%80%938%20(batas%20ulayat%20tidak%20beraturan%20mengikuti%20sungai%2Fpunggungan).%20Bentuk%20tidak%20beraturan%20berarti%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%22lebih%20banyak%20km%2C%20tetapi%20tetap%20tumbuh%20dengan%20%E2%88%9Aluas.%22%0A%20%20%20%20%20%20%20%20)%2C%0A%20%20%20%20%20%20%20%20_chart%2C%0A%20%20%20%20%20%20%20%20mo.md(%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22Pada%20**%7B_f(luas)%7D%20Ha**%3A%20%E2%88%9Aluas%20%3D%20%7B_f(luas%20**%200.5%2C%202)%7D%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22(batas%20persegi%20%E2%89%88%20%7B_f(0.4%20*%20luas%20**%200.5%2C%201)%7D%20km).%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%22Luas%20100%C3%97%20lebih%20besar%20%E2%86%92%20batas%20hanya%2010%C3%97%20lebih%20panjang.%22%0A%20%20%20%20%20%20%20%20)%2C%0A%20%20%20%20%20%20%20%20mo.md(%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22Koef%20Opsi%202%20pada%20%7B_f(luas)%7D%20Ha%20%3D%20**%7B_f(opsi2(luas%2C%201)%2C%201)%7D%20Ha%20setara**%20vs%20%E2%88%9ALuas%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20f%22%7B_f((10%20*%20luas)%20**%200.5%2C%201)%7D%20%E2%86%92%20Opsi%202%20**%7B_f(_rasio%20*%20100%2C%200)%7D%25**%20dari%20kurva%20%E2%88%9ALuas%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%22(%3E100%25%20%3D%20lebih%20mahal%20dari%20model%20batas%2C%20%3C100%25%20%3D%20lebih%20murah).%22%0A%20%20%20%20%20%20%20%20)%2C%0A%20%20%20%20%5D)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <!-- This is a portal for the data editor to render in -->
+    <div id="portal" data-testid="glide-portal" style="position: fixed; left: 0; top: 0; z-index: 9999"></div>
+    <script data-marimo="true">
+      window.__MARIMO_MOUNT_CONFIG__ = {
+            "filename": "notebook.py",
+            "mode": "read",
+            "version": "0.19.11",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "pip"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "medium"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        };
+    </script>
+  </body>
+</html>

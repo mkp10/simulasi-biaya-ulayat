@@ -1,0 +1,5 @@
+# allowlist: only the notebook and the published site go to GitHub (Excel files stay local)
+/*
+!/.gitignore
+!/Simulasi Biaya Pengukuran Ulayat.py
+!/docs/
