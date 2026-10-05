@@ -177,7 +177,74 @@ def _(
         mo.md(f"Fixed Cost: {pct(fixed / total2)} · Variable Cost: {pct((total2 - fixed) / total2)}"),
         (line + titik).properties(width="container"),
     ])
-    return fixed, luas, rp, total, total2, var_ha
+    return fixed, luas, pct, rp, total, total2, var_ha
+
+
+@app.cell
+def _(mo, pd):
+    bidang_editor = mo.ui.data_editor(
+        pd.DataFrame({"Bidang": ["Bidang 1", "Bidang 2", "Bidang 3"], "Luas (Ha)": [50.0, 250.0, 1_200.0]}),
+        label="Daftar bidang (ubah nama/luas, tambah atau hapus baris)",
+    )
+    return (bidang_editor,)
+
+
+@app.cell
+def _(alt, bidang_editor, fixed, mo, opsi2, pd, rp, var_ha):
+    # each bidang is measured on its own: own ATK package (fixed) and its own koef blocks
+    # (each bidang has its own boundary, so the tiers restart per bidang)
+    bidang = pd.DataFrame(bidang_editor.value)
+    bidang["Luas (Ha)"] = pd.to_numeric(bidang["Luas (Ha)"], errors="coerce")
+    _invalid = bidang["Luas (Ha)"].isna() | (bidang["Luas (Ha)"] <= 0)
+    bidang = bidang[~_invalid].reset_index(drop=True)
+
+    bidang["Flat"] = fixed + var_ha * bidang["Luas (Ha)"]
+    bidang["Simulasi Koefisien"] = bidang["Luas (Ha)"].map(lambda ha: fixed + opsi2(ha, var_ha))
+    _luas_total = bidang["Luas (Ha)"].sum()
+    _flat, _sk = bidang["Flat"].sum(), bidang["Simulasi Koefisien"].sum()
+    _gabung = fixed + opsi2(_luas_total, var_ha) if len(bidang) else 0
+
+    _f = lambda x, d=1: f"{x:,.{d}f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    _tabel = bidang.assign(**{
+        "Luas (Ha)": bidang["Luas (Ha)"].map(_f),
+        "Flat": bidang["Flat"].map(rp),
+        "Simulasi Koefisien": bidang["Simulasi Koefisien"].map(rp),
+        "Rata-rata Koef / Ha": (bidang["Simulasi Koefisien"] / bidang["Luas (Ha)"]).map(rp),
+    })
+    _tabel.loc[len(_tabel)] = ["Total", _f(_luas_total), rp(_flat), rp(_sk),
+                               rp(_sk / _luas_total) if _luas_total else "-"]
+
+    _long = bidang.melt(id_vars=["Bidang", "Luas (Ha)"], value_vars=["Flat", "Simulasi Koefisien"],
+                        var_name="skema", value_name="biaya")
+    _bar = alt.Chart(_long, title="Biaya per Bidang").mark_bar().encode(
+        x=alt.X("Bidang:N", title=None, sort=None),
+        xOffset="skema:N",
+        y=alt.Y("biaya:Q", title="Biaya (Rp)", axis=alt.Axis(format=",.0f")),
+        color=alt.Color("skema:N", title="Skema"),
+        tooltip=["Bidang", alt.Tooltip("Luas (Ha):Q", format=",.1f"), "skema",
+                 alt.Tooltip("biaya:Q", format=",.0f")],
+    ).properties(width="container")
+
+    _out = [
+        mo.md("## Simulasi Banyak Bidang"),
+        bidang_editor,
+    ]
+    if _invalid.any():
+        _out.append(mo.callout(mo.md(f"{_invalid.sum()} baris diabaikan: luas kosong, bukan angka, atau ≤ 0."), kind="warn"))
+    if len(bidang):
+        _out += [
+            mo.ui.table(_tabel, selection=None, pagination=False),
+            mo.md(
+                f"**{len(bidang)} bidang, {_f(_luas_total)} Ha** · Flat: **{rp(_flat)}** · "
+                f"Simulasi Koefisien: **{rp(_sk)}** ({_sk / _flat:.1%} dari flat)\n\n"
+                f"Jika semua luas dihitung sebagai **satu bidang** ({_f(_luas_total)} Ha): {rp(_gabung)}. "
+                f"Dipisah per bidang lebih mahal {rp(_sk - _gabung)}, karena tiap bidang punya batas, "
+                "paket ATK, dan blok tarif penuh 0–10 Ha sendiri."
+            ),
+            _bar,
+        ]
+    mo.vstack(_out)
+    return
 
 
 @app.cell(hide_code=True)
