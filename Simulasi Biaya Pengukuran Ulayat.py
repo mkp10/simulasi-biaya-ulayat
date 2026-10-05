@@ -98,7 +98,19 @@ def _(mo, pd):
 
 
 @app.cell
-def _(alt, bidang_editor, fixed, fmt, mo, opsi2, pd, rp, tampil_flat, var_ha):
+def _(
+    alt,
+    bidang_editor,
+    fixed,
+    fmt,
+    lainnya,
+    mo,
+    opsi2,
+    pd,
+    rp,
+    tampil_flat,
+    var_ha,
+):
     # each bidang is measured on its own: own ATK package (fixed) and its own koef blocks
     # (each bidang has its own boundary, so the tiers restart per bidang)
     bidang = pd.DataFrame(bidang_editor.value)
@@ -142,17 +154,16 @@ def _(alt, bidang_editor, fixed, fmt, mo, opsi2, pd, rp, tampil_flat, var_ha):
     if _invalid.any():
         _out.append(mo.callout(mo.md(f"{_invalid.sum()} baris diabaikan: luas kosong, bukan angka, atau ≤ 0."), kind="warn"))
     if len(bidang):
-        _out += [
-            mo.ui.table(_tabel, selection=None, pagination=False),
-            mo.md(
-                f"{_ringkas}\n\n"
-                f"Jika semua luas dihitung sebagai **satu bidang** ({fmt(_luas_total)} Ha): {rp(_gabung)}. "
-                f"Dipisah per bidang lebih mahal {rp(_sk - _gabung)}, karena tiap bidang punya batas, "
-                "paket ATK, dan blok tarif penuh 0–10 Ha sendiri."
-            ),
-            _bar,
-        ]
-    _out.append(tampil_flat)
+        _out += [mo.ui.table(_tabel, selection=None, pagination=False), mo.md(_ringkas)]
+        if lainnya.value:  # "one bidang" comparison and bar chart only with the other analyses
+            _out += [
+                mo.md(
+                    f"Jika semua luas dihitung sebagai **satu bidang** ({fmt(_luas_total)} Ha): {rp(_gabung)}. "
+                    f"Dipisah per bidang lebih mahal {rp(_sk - _gabung)}, karena tiap bidang punya batas, "
+                    "paket ATK, dan blok tarif penuh 0–10 Ha sendiri."
+                ),
+                _bar,
+            ]
     mo.vstack(_out)
     return (bidang,)
 
@@ -223,9 +234,9 @@ def _(
 
 
 @app.cell
-def _(mo):
-    lainnya = mo.ui.switch(label="Tampilkan analisis lainnya (simulasi 1 bidang, Flat vs Koefisien, √Luas)")
-    mo.vstack([mo.md("---"), lainnya])
+def _(mo, tampil_flat):
+    lainnya = mo.ui.switch(label="Tampilkan analisis lainnya (grafik per bidang, simulasi 1 bidang, √Luas)")
+    mo.vstack([mo.md("---"), tampil_flat, lainnya])
     return (lainnya,)
 
 
