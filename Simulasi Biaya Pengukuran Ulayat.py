@@ -185,6 +185,7 @@ def _(
     df,
     fixed,
     fmt,
+    lainnya,
     mo,
     opsi2,
     opsi2_blok,
@@ -224,18 +225,16 @@ def _(
             tooltip=["blok", "koef", alt.Tooltip("ha:Q", format=",.1f", title="Ha di blok ini"),
                      alt.Tooltip("biaya:Q", format=",.0f")],
         ).properties(width="container")
-        _out += [
-            mo.ui.table(_tabel, selection=None, pagination=False),
-            mo.md(f"ATK dihitung sekali per bidang ({_n} × {rp(fixed)})."),
-            _bar,
-        ]
+        _out.append(mo.ui.table(_tabel, selection=None, pagination=False))
+        if lainnya.value:  # ATK note and block chart only with the other analyses
+            _out += [mo.md(f"ATK dihitung sekali per bidang ({_n} × {rp(fixed)})."), _bar]
     mo.vstack(_out)
     return
 
 
 @app.cell
 def _(mo, tampil_flat):
-    lainnya = mo.ui.switch(label="Tampilkan analisis lainnya (grafik per bidang, simulasi 1 bidang, √Luas)")
+    lainnya = mo.ui.switch(label="Tampilkan analisis lainnya (grafik per bidang & per blok, simulasi 1 bidang, √Luas)")
     mo.vstack([mo.md("---"), tampil_flat, lainnya])
     return (lainnya,)
 
