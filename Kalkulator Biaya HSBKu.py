@@ -71,7 +71,7 @@ def _(PERSEN, TIERS, math, pd):
     # ATK C PNBP fixed cost per bidang: Rp 164.000 for 10-20 Ha, Rp 1.487.000 (kalkulator.xlsx I21) above 20 Ha
 
     def rinci(L, hsbku, jawa_bali=False):
-        """kalkulator.xlsx kolom H/I: Jumlah SBK = min(L, 10) Ha × harga; Bagian PNBP = sisa biaya di atas SBK:
+        """kalkulator.xlsx kolom H/I: Bagian SBK = min(L, 10) Ha × harga; Bagian PNBP = sisa biaya di atas SBK:
         20% Operasional lapang, ATK C tetap (Rp 164.000 untuk 10–20 Ha, Rp 1.487.000 di atas 20 Ha), sisa 80% ke 3 item 521219 C menurut SBK."""
         d = rincian.drop(columns=["luar", "jawa"]).assign(harga=rincian["jawa" if jawa_bali else "luar"])
         d["vol"] = min(L, 10)
@@ -105,9 +105,9 @@ def _(PERSEN, TIERS, math, pd):
 
 @app.cell
 def _(HSBKU, mo):
-    provinsi = mo.ui.dropdown(options=list(HSBKU), value="Sumatera Barat", label="1. Pilih provinsi")
+    provinsi = mo.ui.dropdown(options=list(HSBKU), value="Sumatera Barat", label="1\\. Pilih provinsi")
     jenis = mo.ui.radio(options=["Pertanian", "Non Pertanian"], value="Pertanian", inline=True, label="HSBKu")
-    luas = mo.ui.number(start=0, value=100, step=0.01, label="2. Luas (Ha)")
+    luas = mo.ui.number(start=0, value=100, step=0.01, label="2\\. Luas (Ha)")
     # TAK at cost per honor item (kalkulator.xlsx J24:L26): fixed 3 items x 3 kolom
     tak_input = mo.ui.dictionary({
         item: mo.ui.dictionary({k: mo.ui.number(start=0, value=0, step=1_000) for k in ["Transportasi", "Akomodasi", "Konsumsi"]})
@@ -137,8 +137,8 @@ def _(GT, HSBKU, JAWA_BALI, jenis, loc, luas, mo, pd, provinsi, rinci, style, ta
     else:
         _tak = pd.DataFrame.from_dict(tak_input.value, orient="index")[TAK].fillna(0)
         _d = rinci(_L, hsbku, _jb)
-        _d["satuan"] = "Hektar"
-        _d = _d.join(_tak, on="item").fillna({k: 0 for k in TAK})
+        # TAK only on the 3 honor items; NaN elsewhere renders blank
+        _d = _d.join(_tak, on="item")
         _d["total"] = _d[NUM[:-1]].sum(axis=1)
 
         # flatten: per sub-komponen group -> akun row (with subtotals) + its item rows
@@ -146,10 +146,8 @@ def _(GT, HSBKU, JAWA_BALI, jenis, loc, luas, mo, pd, provinsi, rinci, style, ta
         for (_sk, _sn), _g in _d.groupby(["sub", "sub_nama"], sort=False):
             _grp = f"{_sk}  {_sn}  —  {rp(_g.total.sum())}"
             for (_ak, _an), _ga in _g.groupby(["akun", "akun_nama"], sort=False):
-                _rows.append(dict(grp=_grp, kode=_ak, uraian=_an, vol=None, satuan="", harga=None,
-                                  **_ga[NUM].sum(), is_akun=True))
-                _rows += [dict(grp=_grp, kode="", uraian=r["item"], vol=r["vol"], satuan=r["satuan"], harga=r["harga"],
-                               **r[NUM], is_akun=False) for _, r in _ga.iterrows()]
+                _rows.append(dict(grp=_grp, kode=_ak, uraian=_an, **_ga[NUM].sum(min_count=1), is_akun=True))
+                _rows += [dict(grp=_grp, kode="", uraian=r["item"], **r[NUM], is_akun=False) for _, r in _ga.iterrows()]
         _disp = pd.DataFrame(_rows)
         _out += [
             mo.md("## Rincian Biaya"),
@@ -159,14 +157,12 @@ def _(GT, HSBKU, JAWA_BALI, jenis, loc, luas, mo, pd, provinsi, rinci, style, ta
                         subtitle=f"052  Pengukuran dan Pemetaan Bidang Tanah (UTAMA)  ·  {fmt(_L)} Ha  ·  "
                                  f"HSBKu {provinsi.value} ({jenis.value}) {rp(hsbku)}")
             .tab_spanner(label="TAK (at cost)", columns=TAK)
-            .cols_label(kode="Kode", uraian="Uraian", vol="Vol", satuan="Satuan", harga="Harga Satuan",
-                        sbk="Jumlah SBK", pnbp="Bagian PNBP", total="Yang dicairkan")
-            .fmt_number(columns=["harga", *NUM], decimals=0, sep_mark=".", dec_mark=",")
-            .fmt_number(columns="vol", decimals=2, drop_trailing_zeros=True, sep_mark=".", dec_mark=",")
-            .sub_missing(columns=["vol", "harga"], missing_text="")
+            .cols_label(kode="Kode", uraian="Uraian", sbk="Bagian SBK", pnbp="Bagian PNBP", total="Yang dicairkan")
+            .fmt_number(columns=NUM, decimals=0, sep_mark=".", dec_mark=",")
+            .sub_missing(columns=TAK, missing_text="")
             .tab_style(style=style.text(weight="bold"), locations=loc.body(rows=_disp.index[_disp.is_akun].tolist()))
             .tab_style(style=style.text(weight="bold"), locations=loc.row_groups())
-            .cols_align("right", columns=["kode", "vol", "harga", *NUM])
+            .cols_align("right", columns=["kode", *NUM])
             .tab_source_note(f"Total yang dicairkan: {rp(_d.total.sum())}")
             .tab_style(style=style.text(weight="bold", size="large"), locations=loc.source_notes()),
         ]
@@ -176,11 +172,8 @@ def _(GT, HSBKU, JAWA_BALI, jenis, loc, luas, mo, pd, provinsi, rinci, style, ta
 
 @app.cell
 def _(mo):
-    mo.md(r"""
-    ---
-    ## Rumus
-
-    Biaya pengukuran (Book1.pdf, kalkulator.xlsx), $L$ = luas dalam Ha, HSBKu dari PMK 51/PMK.02/2012,
+    _rumus = mo.md(r"""
+    Biaya pengukuran (Book1.pdf), $L$ = luas dalam Ha, HSBKu dari PMK 51/PMK.02/2012,
     hasil dibulatkan ke bawah ke ribuan.
     $SBK$ = Rp 1.740.000/Ha (Luar Jawa Bali) atau Rp 884.000/Ha (Jawa Bali: Banten, Jawa Barat, DKI Jakarta,
     Jawa Tengah, Jawa Timur, DI Yogyakarta, Bali):
@@ -192,15 +185,17 @@ def _(mo):
     | $20 < L \le 1.010$ | $T = 10 \times SBK + 85{,}54\% \times \left(\frac{(L-10)\times 10.000}{4.000} \times HSBKu + 14.000.000\right)$ |
     | $L > 1.010$ | $T = 10 \times SBK + 85{,}54\% \times \left(\frac{(L-10)\times 10.000}{10.000} \times HSBKu + 134.000.000\right)$ |
 
-    Rincian per item (kalkulator.xlsx):
+    Rincian per item:
 
-    - **Jumlah SBK** = $\min(L, 10)$ Ha × harga satuan item.
-    - **Bagian PNBP** = $T -$ total Jumlah SBK, dibagi: 20% ke Operasional lapang; Rp 164.000 untuk 10–20 Ha dan
+    - **Bagian SBK** = $\min(L, 10)$ Ha × harga satuan item.
+    - **Bagian PNBP** = $T -$ total Bagian SBK, dibagi: 20% ke Operasional lapang; Rp 164.000 untuk 10–20 Ha dan
       Rp 1.487.000 di atas 20 Ha (tetap; jika 80% Bagian PNBP lebih kecil, ATK C = 80% Bagian PNBP)
-      ke ATK sub-komponen C; sisa 80% ke Pembantu Ukur, Petugas Ukur, Koordinator menurut Jumlah SBK masing-masing.
+      ke ATK sub-komponen C; sisa 80% ke Pembantu Ukur, Petugas Ukur, Koordinator menurut Bagian SBK masing-masing.
     - **TAK** (Transportasi, Akomodasi, Konsumsi) at cost.
-    - **Yang dicairkan** = Jumlah SBK + Bagian PNBP + TAK.
+    - **Yang dicairkan** = Bagian SBK + Bagian PNBP + TAK.
     """)
+    # collapsed by default
+    mo.vstack([mo.md("---"), mo.accordion({"Rumus": _rumus})])
     return
 
 
