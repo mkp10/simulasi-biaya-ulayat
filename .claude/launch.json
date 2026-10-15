@@ -1,0 +1,43 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "marimo-justifikasi",
+      "runtimeExecutable": "uvx",
+      "runtimeArgs": [
+        "--with",
+        "pandas",
+        "--with",
+        "altair",
+        "--with",
+        "numpy",
+        "marimo",
+        "run",
+        "Justifikasi Tier Ulayat.py",
+        "--headless",
+        "--no-token",
+        "--port",
+        "2718"
+      ],
+      "port": 2718
+    },
+    {
+      "name": "marimo-hsbku",
+      "runtimeExecutable": "uvx",
+      "runtimeArgs": [
+        "--with",
+        "pandas",
+        "--with",
+        "great_tables",
+        "marimo",
+        "run",
+        "Kalkulator Biaya HSBKu.py",
+        "--headless",
+        "--no-token",
+        "--port",
+        "2719"
+      ],
+      "port": 2719
+    }
+  ]
+}

@@ -3,3 +3,7 @@
 !/.gitignore
 !/Simulasi Biaya Pengukuran Ulayat.py
 !/docs/
+!/Kalkulator Biaya HSBKu.py
+!/.claude/
+/.claude/*
+!/.claude/launch.json
