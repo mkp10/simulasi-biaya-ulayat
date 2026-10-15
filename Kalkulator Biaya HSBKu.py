@@ -1,12 +1,3 @@
-# /// script
-# requires-python = ">=3.12"
-# dependencies = [
-#     "marimo",
-#     "pandas",
-#     "great-tables",
-# ]
-# ///
-
 import marimo
 
 __generated_with = "0.19.11"
@@ -14,19 +5,12 @@ app = marimo.App(width="medium")
 
 
 @app.cell
-async def _():
+def _():
     import marimo as mo
     import math
-    import sys
     import pandas as pd
 
-    if sys.platform == "emscripten":  # published WASM site: great-tables is not bundled with Pyodide
-        import micropip
-        # 1.x needs multimark (no pure-Python wheel); 0.20 uses commonmark and has everything used here
-        await micropip.install("great-tables==0.20.0")
-    from great_tables import GT, loc, style
-
-    return GT, loc, math, mo, pd, style
+    return math, mo, pd
 
 
 @app.cell
@@ -132,7 +116,7 @@ def _(HSBKU, mo):
 
 
 @app.cell
-def _(GT, HSBKU, JAWA_BALI, jenis, loc, luas, mo, pd, provinsi, rinci, style, tak_input):
+def _(HSBKU, JAWA_BALI, jenis, luas, mo, pd, provinsi, rinci, tak_input):
     TAK = ["Transportasi", "Akomodasi", "Konsumsi"]
     NUM = ["sbk", "pnbp", *TAK, "total"]
     rp = lambda x: f"Rp {x:,.0f}".replace(",", ".")
@@ -156,30 +140,32 @@ def _(GT, HSBKU, JAWA_BALI, jenis, loc, luas, mo, pd, provinsi, rinci, style, ta
         _d = _d.join(_tak, on="item")
         _d["total"] = _d[NUM[:-1]].sum(axis=1)
 
-        # flatten: per sub-komponen group -> akun row (with subtotals) + its item rows
+        # flatten: sub-komponen row + akun rows (with subtotals) + item rows; sub/akun rows in bold
         _rows = []
         for (_sk, _sn), _g in _d.groupby(["sub", "sub_nama"], sort=False):
-            _grp = f"{_sk}  {_sn}  —  {rp(_g.total.sum())}"
+            _rows.append(dict(kode=_sk, uraian=_sn, **_g[NUM].sum(min_count=1), bold=True))
             for (_ak, _an), _ga in _g.groupby(["akun", "akun_nama"], sort=False):
-                _rows.append(dict(grp=_grp, kode=_ak, uraian=_an, **_ga[NUM].sum(min_count=1), is_akun=True))
-                _rows += [dict(grp=_grp, kode="", uraian=r["item"], **r[NUM], is_akun=False) for _, r in _ga.iterrows()]
+                _rows.append(dict(kode=_ak, uraian=_an, **_ga[NUM].sum(min_count=1), bold=True))
+                _rows += [dict(kode="", uraian=r["item"], **r[NUM], bold=False) for _, r in _ga.iterrows()]
         _disp = pd.DataFrame(_rows)
+        _bold = set(_disp.index[_disp.bold].astype(str))
+        _disp = _disp.drop(columns="bold").rename(columns={
+            "kode": "Kode", "uraian": "Uraian", "sbk": "Bagian SBK", "pnbp": "Bagian PNBP", "total": "Yang dicairkan"})
+        _ncols = ["Bagian SBK", "Bagian PNBP", *TAK, "Yang dicairkan"]
+        _num = lambda x: "" if pd.isna(x) else f"{x:,.0f}".replace(",", ".")
         _out += [
             mo.md("## Rincian Biaya"),
-            GT(_disp.drop(columns="is_akun"), groupname_col="grp")
-            .tab_header(title=("6413.QAB.U16  PBT Luasan (Ulayat/HKB Redis/BMN/HPL) Jawa Bali" if _jb else
-                               "6413.QAB.U17  PBT Luasan (Ulayat/HKB Redis/BMN/HPL) Luar Jawa Bali"),
-                        subtitle=f"052  Pengukuran dan Pemetaan Bidang Tanah (UTAMA)  ·  {fmt(_L)} Ha  ·  "
-                                 f"HSBKu {provinsi.value} ({jenis.value}) {rp(hsbku)}")
-            .tab_spanner(label="TAK (at cost)", columns=TAK)
-            .cols_label(kode="Kode", uraian="Uraian", sbk="Bagian SBK", pnbp="Bagian PNBP", total="Yang dicairkan")
-            .fmt_number(columns=NUM, decimals=0, sep_mark=".", dec_mark=",")
-            .sub_missing(columns=TAK, missing_text="")
-            .tab_style(style=style.text(weight="bold"), locations=loc.body(rows=_disp.index[_disp.is_akun].tolist()))
-            .tab_style(style=style.text(weight="bold"), locations=loc.row_groups())
-            .cols_align("right", columns=["kode", *NUM])
-            .tab_source_note(f"Total yang dicairkan: {rp(_d.total.sum())}")
-            .tab_style(style=style.text(weight="bold", size="large"), locations=loc.source_notes()),
+            mo.md(("**6413.QAB.U16  PBT Luasan (Ulayat/HKB Redis/BMN/HPL) Jawa Bali**" if _jb else
+                   "**6413.QAB.U17  PBT Luasan (Ulayat/HKB Redis/BMN/HPL) Luar Jawa Bali**")
+                  + f"<br>052 Pengukuran dan Pemetaan Bidang Tanah (UTAMA) · {fmt(_L)} Ha · "
+                    f"HSBKu {provinsi.value} ({jenis.value}) {rp(hsbku)}"),
+            mo.ui.table(
+                _disp, selection=None, pagination=False, show_column_summaries=False, show_data_types=False,
+                show_download=False, format_mapping={c: _num for c in _ncols},
+                text_justify_columns={c: "right" for c in _ncols}, wrapped_columns=["Uraian"],
+                style_cell=lambda row, col, val: {"fontWeight": "bold"} if row in _bold else {},
+            ),
+            mo.md(f"### Total yang dicairkan: {rp(_d.total.sum())}"),
         ]
     mo.vstack(_out)
     return

@@ -27,8 +27,6 @@
       "runtimeArgs": [
         "--with",
         "pandas",
-        "--with",
-        "great_tables",
         "marimo",
         "run",
         "Kalkulator Biaya HSBKu.py",
