@@ -1,3 +1,12 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "marimo",
+#     "pandas",
+#     "great-tables",
+# ]
+# ///
+
 import marimo
 
 __generated_with = "0.19.11"
@@ -5,10 +14,16 @@ app = marimo.App(width="medium")
 
 
 @app.cell
-def _():
+async def _():
     import marimo as mo
     import math
+    import sys
     import pandas as pd
+
+    if sys.platform == "emscripten":  # published WASM site: great-tables is not bundled with Pyodide
+        import micropip
+        # 1.x needs multimark (no pure-Python wheel); 0.20 uses commonmark and has everything used here
+        await micropip.install("great-tables==0.20.0")
     from great_tables import GT, loc, style
 
     return GT, loc, math, mo, pd, style
