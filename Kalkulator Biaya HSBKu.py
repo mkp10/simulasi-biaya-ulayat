@@ -126,15 +126,18 @@ def _(HSBKU, JAWA_BALI, jenis, luas, mo, pd, provinsi, rinci, tak_input):
     _jb = provinsi.value in JAWA_BALI
 
     _out = [mo.md("# Kalkulator Biaya Pengukuran PBT Luasan"),
-            mo.hstack([provinsi, jenis], justify="start", gap=2), luas,
-            mo.md("3\\. Isi TAK at cost (Rp) per item"),
-            mo.vstack([mo.hstack([mo.md(""), *map(mo.md, TAK)], widths="equal")] + [
-                mo.hstack([mo.md(item), *tak_input[item].values()], widths="equal") for item in tak_input
-            ])]
+            mo.hstack([provinsi, jenis], justify="start", gap=2), luas]
+    if _L > 10:  # TAK at cost only applies to the part above 10 Ha
+        _out += [mo.md("3\\. Isi TAK at cost (Rp) per item"),
+                 mo.vstack([mo.hstack([mo.md(""), *map(mo.md, TAK)], widths="equal")] + [
+                     mo.hstack([mo.md(item), *tak_input[item].values()], widths="equal") for item in tak_input
+                 ])]
     if _L <= 0:
         _out.append(mo.callout(mo.md("Isi luas lebih dari 0 Ha."), kind="warn"))
     else:
         _tak = pd.DataFrame.from_dict(tak_input.value, orient="index")[TAK].fillna(0)
+        if _L <= 10:  # hidden input -> no TAK (blank columns), even if values were typed earlier
+            _tak[:] = float("nan")
         _d = rinci(_L, hsbku, _jb)
         # TAK only on the 3 honor items; NaN elsewhere renders blank
         _d = _d.join(_tak, on="item")
