@@ -164,6 +164,7 @@ def _(HSBKU, JAWA_BALI, jenis, luas, mo, pd, provinsi, rinci, tak_input):
             for (_ak, _an), _ga in _g.groupby(["akun", "akun_nama"], sort=False):
                 _rows.append(dict(kode=_ak, uraian=_an, **_ga[NUM].sum(min_count=1), bold=True))
                 _rows += [dict(kode="", uraian=r["item"], **r[NUM], bold=False) for _, r in _ga.iterrows()]
+        _rows.append(dict(kode="", uraian="Total", **_d[NUM].sum(min_count=1), bold=True))  # grand total, items only
         _disp = pd.DataFrame(_rows)
         _bold = set(_disp.index[_disp.bold].astype(str))
         _disp = _disp.drop(columns="bold").rename(columns={
@@ -182,8 +183,21 @@ def _(HSBKU, JAWA_BALI, jenis, luas, mo, pd, provinsi, rinci, tak_input):
                 text_justify_columns={c: "right" for c in _ncols}, wrapped_columns=["Uraian"],
                 style_cell=lambda row, col, val: {"fontWeight": "bold"} if row in _bold else {},
             ),
-            mo.md(f"### Total yang dicairkan: {rp(_d.total.sum())}"),
+            # explicit weight: the heading font ignores <strong>
+            mo.Html(f'<div style="font-size:1.35rem;font-weight:700">Total yang dicairkan: {rp(_d.total.sum())}</div>'),
         ]
+        # CSV for Indonesian Excel: ';' separator, decimal comma, no thousands separator; item rows + total only
+        _csv = _d[["sub", "akun", "item", *NUM]].rename(columns={
+            "sub": "Sub Komponen", "akun": "Akun", "item": "Item", "sbk": "Bagian SBK", "pnbp": "Bagian PNBP",
+            "total": "Yang dicairkan"})
+        _csv.loc[len(_csv)] = ["", "", "Total", *_d[NUM].sum(min_count=1)]
+        _cnum = lambda x: "" if pd.isna(x) else (f"{x:.0f}" if round(x, 2) == round(x) else f"{x:.2f}".replace(".", ","))
+        _csv[_csv.columns[3:]] = _csv[_csv.columns[3:]].map(_cnum)
+        _bytes = _csv.to_csv(sep=";", index=False).encode("utf-8-sig")
+        _out.append(mo.download(
+            data=_bytes, mimetype="text/csv", label="Unduh CSV",
+            filename=f"Rincian Biaya {provinsi.value} {fmt(_L)} Ha HSBKu {hsbku}.csv",
+        ))
     mo.vstack(_out)
     return
 
