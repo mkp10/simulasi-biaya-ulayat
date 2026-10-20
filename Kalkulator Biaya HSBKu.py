@@ -116,7 +116,11 @@ def _(HSBKU, mo):
     luas = mo.ui.number(start=0, value=100, step=0.01, label="2\\. Luas (Ha)")
     # TAK at cost per honor item (kalkulator.xlsx J24:L26): fixed 3 items x 3 kolom
     tak_input = mo.ui.dictionary({
-        item: mo.ui.dictionary({k: mo.ui.number(start=0, value=0, step=1_000) for k in ["Transportasi", "Akomodasi", "Konsumsi"]})
+        item: mo.ui.dictionary({
+            # Pembantu Ukur gets no Akomodasi: input locked at 0
+            k: mo.ui.number(start=0, value=0, step=1_000, disabled=(item, k) == ("Pembantu Ukur", "Akomodasi"))
+            for k in ["Transportasi", "Akomodasi", "Konsumsi"]
+        })
         for item in ["Pembantu Ukur", "Petugas Ukur", "Koordinator"]
     })
     return jenis, luas, provinsi, tak_input
@@ -133,10 +137,13 @@ def _(HSBKU, JAWA_BALI, jenis, luas, mo, pd, provinsi, rinci, tak_input):
     _jb = provinsi.value in JAWA_BALI
 
     _out = [mo.md("# Kalkulator Biaya Pengukuran PBT Luasan"),
-            mo.hstack([provinsi, jenis], justify="start", gap=2), luas]
+            mo.hstack([provinsi, jenis], justify="start", gap=2), luas,
+            mo.md("<small>Pemisah desimal mengikuti bahasa browser: koma untuk Bahasa Indonesia (mis. 10,5), "
+                  "titik untuk English (mis. 10.5).</small>")]
     if _L > 10:  # TAK at cost only applies to the part above 10 Ha
         _out += [mo.md("3\\. Isi TAK at cost (Rp) per item"),
-                 mo.vstack([mo.hstack([mo.md(""), *map(mo.md, TAK)], widths="equal")] + [
+                 mo.md("<small>Isi dalam Rupiah tanpa titik atau koma, mis. 500000.</small>"),
+                 mo.vstack([mo.hstack([mo.md(""), *(mo.md(f"{k} (Rp)") for k in TAK)], widths="equal")] + [
                      mo.hstack([mo.md(item), *tak_input[item].values()], widths="equal") for item in tak_input
                  ])]
     if _L <= 0:
