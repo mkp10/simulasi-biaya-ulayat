@@ -71,19 +71,22 @@ def _(PERSEN, TIERS, math, pd):
 
     def rinci(L, hsbku, jawa_bali=False):
         """kalkulator.xlsx kolom H/I: Bagian SBK = min(L, 10) Ha × harga; Bagian PNBP = sisa biaya di atas SBK:
-        20% Operasional lapang, ATK C tetap (Rp 164.000 untuk 10–20 Ha, Rp 1.487.000 di atas 20 Ha), sisa 80% ke 3 item 521219 C menurut SBK."""
+        10–20 Ha: 28% Operasional lapang, 72% Pengukuran; di atas 20 Ha: 20% / 80%. Dari bagian Pengukuran,
+        ATK C tetap (Rp 164.000 untuk 10–20 Ha, Rp 1.487.000 di atas 20 Ha), sisanya ke 3 item 521219 C menurut SBK."""
         d = rincian.drop(columns=["luar", "jawa"]).assign(harga=rincian["jawa" if jawa_bali else "luar"])
         d["vol"] = min(L, 10)
         d["sbk"] = d.vol * d.harga
         pnbp = biaya_ukur(L, hsbku, d.harga.sum()) - d.sbk.sum()
-        # ATK C PNBP is a fixed cost, but never more than the 80% share: just above 10 Ha ATK C takes what is
-        # left of the 80% and the honor items get 0, so the items always add up to the formula total
-        atk_c = min(164_000 if L <= 20 else 1_487_000, pnbp * 0.8)
+        # Pengukuran share of PNBP: 72% for 10-20 Ha, 80% above 20 Ha; the rest goes to Operasional lapang.
+        # ATK C PNBP is a fixed cost, never more than the Pengukuran share (just above 10 Ha ATK C takes all of it
+        # and the honor items get 0), so the items always add up to the formula total
+        ukur = pnbp * (0.72 if L <= 20 else 0.8)
+        atk_c = min(164_000 if L <= 20 else 1_487_000, ukur)
         honor = (d["sub"] == "C") & (d.akun == "521219")
         d["pnbp"] = 0.0
-        d.loc[d.item == "Operasional lapang", "pnbp"] = pnbp * 0.2
+        d.loc[d.item == "Operasional lapang", "pnbp"] = pnbp - ukur
         d.loc[(d["sub"] == "C") & (d.item == "ATK"), "pnbp"] = atk_c
-        d.loc[honor, "pnbp"] = (pnbp * 0.8 - atk_c) * d.sbk[honor] / d.sbk[honor].sum()
+        d.loc[honor, "pnbp"] = (ukur - atk_c) * d.sbk[honor] / d.sbk[honor].sum()
         return d
 
     # self-check against kalkulator.xlsx (L = 22 Ha, HSBKu 60.000) and hand-computed values
@@ -94,8 +97,10 @@ def _(PERSEN, TIERS, math, pd):
     assert round((_x.sbk + _x.pnbp).sum()) == 30_915_000
     assert biaya_ukur(5, 50_000, 1_740_000) == 8_700_000 and rinci(5, 50_000).pnbp.sum() == 0
     assert rinci(15, 50_000).pnbp.iloc[2] == 164_000 and rinci(21, 50_000).pnbp.iloc[2] == 1_487_000
-    _y = rinci(10.1, 20_000)  # PNBP 119.000: ATK C gets the 80% (95.200), honor items 0
-    assert round(_y.pnbp.iloc[2]) == 95_200 and (_y.pnbp.iloc[3:] == 0).all() and round(_y.pnbp.sum()) == 119_000
+    _y = rinci(10.1, 20_000)  # PNBP 119.000: Operasional 28% (33.320), ATK C gets all of the 72% (85.680), honor 0
+    assert round(_y.pnbp.iloc[1]) == 33_320 and round(_y.pnbp.iloc[2]) == 85_680 and (_y.pnbp.iloc[3:] == 0).all()
+    _z = rinci(16, 50_000)  # PNBP 5.217.000: 28% = 1.460.760, 72% = 3.756.240 (164.000 ATK C + 3.592.240 honor)
+    assert round(_z.pnbp.iloc[1]) == 1_460_760 and round(_z.pnbp.iloc[3:].sum()) == 3_592_240 and round(_z.pnbp.sum()) == 5_217_000
     assert biaya_ukur(15, 50_000, 1_740_000) == 17_400_000 + 4_362_000  # 0.8554 × (5.000.000 + 100.000) = 4.362.540
     _j = rinci(15, 50_000, jawa_bali=True)
     assert _j.sbk.sum() == 8_840_000 and round((_j.sbk + _j.pnbp).sum()) == 8_840_000 + 4_362_000
@@ -192,9 +197,10 @@ def _(mo):
     Rincian per item:
 
     - **Bagian SBK** = $\min(L, 10)$ Ha × harga satuan item.
-    - **Bagian PNBP** = $T -$ total Bagian SBK, dibagi: 20% ke Operasional lapang; Rp 164.000 untuk 10–20 Ha dan
-      Rp 1.487.000 di atas 20 Ha (tetap; jika 80% Bagian PNBP lebih kecil, ATK C = 80% Bagian PNBP)
-      ke ATK sub-komponen C; sisa 80% ke Pembantu Ukur, Petugas Ukur, Koordinator menurut Bagian SBK masing-masing.
+    - **Bagian PNBP** = $T -$ total Bagian SBK, dibagi ke Operasional lapang dan Pengukuran:
+      28% / 72% untuk 10–20 Ha, 20% / 80% di atas 20 Ha. Dari bagian Pengukuran, ATK sub-komponen C tetap
+      Rp 164.000 (10–20 Ha) atau Rp 1.487.000 (di atas 20 Ha), paling banyak sebesar bagian Pengukuran;
+      sisanya ke Pembantu Ukur, Petugas Ukur, Koordinator menurut Bagian SBK masing-masing.
     - **TAK** (Transportasi, Akomodasi, Konsumsi) at cost.
     - **Yang dicairkan** = Bagian SBK + Bagian PNBP + TAK.
     """)
