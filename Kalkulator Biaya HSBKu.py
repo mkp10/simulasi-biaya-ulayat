@@ -1,3 +1,4 @@
+
 import marimo
 
 __generated_with = "0.19.11"
@@ -142,6 +143,7 @@ def _(HSBKU, JAWA_BALI, jenis, luas, mo, pd, provinsi, rinci, tak_input):
                   "titik untuk English (mis. 10.5).</small>")]
     if _L > 10:  # TAK at cost only applies to the part above 10 Ha
         _out += [mo.md("3\\. Isi TAK at cost (Rp) per item"),
+                 mo.md("<small>Harus disertai dengan eviden untuk pencairan.</small>"),
                  mo.md("<small>Isi dalam Rupiah tanpa titik atau koma, mis. 500000.</small>"),
                  mo.vstack([mo.hstack([mo.md(""), *(mo.md(f"{k} (Rp)") for k in TAK)], widths="equal")] + [
                      mo.hstack([mo.md(item), *tak_input[item].values()], widths="equal") for item in tak_input
